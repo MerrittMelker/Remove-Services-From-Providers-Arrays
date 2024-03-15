@@ -1,0 +1,25 @@
+{
+  "name": "Remove-Services-From-Providers-Arrays",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MerrittMelker/Remove-Services-From-Providers-Arrays.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MerrittMelker/Remove-Services-From-Providers-Arrays/issues"
+  },
+  "homepage": "https://github.com/MerrittMelker/Remove-Services-From-Providers-Arrays#readme",
+  "dependencies": {
+    "glob": "^10.3.10",
+    "ts-morph": "^22.0.0",
+    "typescript": "^5.4.2"
+  }
+}
