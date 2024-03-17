@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "Remove-Services-From-Providers-Arrays",
   "version": "1.0.0",
   "description": "",

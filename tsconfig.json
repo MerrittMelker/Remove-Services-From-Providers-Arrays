@@ -1,0 +1,7 @@
+﻿{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "nodenext",
+    // other options...
+  }
+}
