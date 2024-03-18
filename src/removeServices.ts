@@ -1,9 +1,10 @@
 ﻿import {Project, SourceFile} from "ts-morph";
 import {glob} from 'glob';
 
-const srcDirectory = `D:/tnc-main/apps/TessituraWeb/src/app`;
-const moduleFilePaths = await glob([`${srcDirectory}/**/*.module.ts`]);
+const srcDirectory = `D:/tnc-main/src/apps/TessituraWeb/WebAppNG/src/app`;
+const moduleFilePaths = await glob(`${srcDirectory}/**/*.module.ts`, { ignore: 'node_modules/**' });
 const project = new Project();
+
 moduleFilePaths.forEach( path => {
     const sourceFile = project.addSourceFileAtPath(path);
     removeServicesFromProviders(sourceFile)
@@ -11,35 +12,34 @@ moduleFilePaths.forEach( path => {
 
 function removeServicesFromProviders(sourceFile: SourceFile) {
     const moduleImports = sourceFile.getImportDeclarations();
-    const tnApiImport = moduleImports.find(
+
+    const tnApiImportDeclarations = moduleImports.filter(
         importDeclaration => importDeclaration.getModuleSpecifierValue() === `tn-api`
     );
-    
-    // const importsToRemove = sourceFile.getImportDeclarations((declaration) => {
-    //     return declaration.getModuleSpecifierValue() === 'tn-api';
-    // });
 
-    // const serviceNames = importsToRemove.flatMap((importDeclaration) => {
-    //     return importDeclaration.getNamedImports().map((namedImport) => namedImport.getName());
-    // });
-    //
-    // if (serviceNames.length > 0) {
-    //     // Find the providers array within @NgModule decorator
-    //     const ngModuleDecorator = sourceFile.getClasses()[0]?.getDecorator('NgModule');
-    //     const providersArray = ngModuleDecorator?.getArguments()[0]?.asObjectLiteralExpression()?.getProperty('providers')?.asArrayLiteralExpression();
-    //
-    //     if (providersArray) {
-    //         // Remove the services from the providers array
-    //         serviceNames.forEach((serviceName) => {
-    //             providersArray.getElements().forEach((element, index) => {
-    //                 if (element.getText() === serviceName) {
-    //                     providersArray.removeElement(index);
-    //                 }
-    //             });
-    //         });
-    //     }
-    //
-    //     // Remove the import statements
-    //     importsToRemove.forEach((importDeclaration) => importDeclaration.remove());
-    // }
+    const serviceNames = tnApiImportDeclarations.flatMap(
+        importDeclaration => importDeclaration.getNamedImports().map(
+            namedImport => namedImport.getName()
+        )
+    );
+
+    if (serviceNames.length > 0) {
+        const ngModuleDecorator = sourceFile.getClasses()[0]?.getDecorator('NgModule');
+
+        const argument = ngModuleDecorator?.getArguments()[0];
+        const providersArray = argument && ts.isObjectLiteralExpression(argument) ? argument.asObjectLiteralExpression().getProperty('providers')?.asArrayLiteralExpression() : undefined;
+
+
+        if (providersArray) {
+            serviceNames.forEach(serviceName => {
+                providersArray.getElements().forEach((element, index) => {
+                    if (element.getText() === serviceName) {
+                        providersArray.removeElement(index);
+                    }
+                });
+            });
+        }
+
+        tnApiImportDeclarations.forEach(importDeclaration => importDeclaration.remove());
+    }
 }

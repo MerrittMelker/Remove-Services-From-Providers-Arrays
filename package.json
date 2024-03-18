@@ -22,5 +22,8 @@
     "glob": "^10.3.10",
     "ts-morph": "^22.0.0",
     "typescript": "^5.4.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }
