@@ -5,12 +5,12 @@ const srcDirectory = `D:/tnc-main/src/apps/TessituraWeb/WebAppNG/src/app`;
 const moduleFilePaths = await glob(`${srcDirectory}/**/*.module.ts`, { ignore: 'node_modules/**' });
 const project = new Project();
 
-moduleFilePaths.forEach( path => {
+moduleFilePaths.forEach( async path => {
     const sourceFile = project.addSourceFileAtPath(path);
-    removeServicesFromProviders(sourceFile)
+    await removeServicesFromProviders(sourceFile)
 });
 
-function removeServicesFromProviders(sourceFile: SourceFile) {
+async function removeServicesFromProviders(sourceFile: SourceFile) {
     const moduleImports = sourceFile.getImportDeclarations();
 
     const tnApiImportDeclarations = moduleImports.filter(
@@ -30,16 +30,20 @@ function removeServicesFromProviders(sourceFile: SourceFile) {
 
         if (providersProperty) {
             serviceNames.forEach(serviceName => {
-                const providersArray = providersProperty.getFirstChildByKind(SyntaxKind.ArrayLiteralExpression);
-                providersArray?.getElements().forEach( (element, index) => {
+                const providersArrayExpression = providersProperty.getFirstChildByKind(SyntaxKind.ArrayLiteralExpression);
+                const providerElements = providersArrayExpression?.getElements();
+
+                for(let i = providerElements.length - 1; i >= 0; i--) {
+                    const element = providerElements[i];
                     const elementText = element.getText();
                     if (elementText === serviceName) {
-                        providersArray.removeElement(index);
+                        providersArrayExpression.removeElement(i);
                     }
-                });
+                }
             });
         }
 
         tnApiImportDeclarations.forEach(importDeclaration => importDeclaration.remove());
+        await sourceFile.save();
     }
 }
