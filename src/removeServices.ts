@@ -1,5 +1,5 @@
-﻿import {Project, SourceFile} from "ts-morph";
-import {glob} from 'glob';
+﻿import { ObjectLiteralExpression, Project, SourceFile, SyntaxKind } from "ts-morph";
+import { glob } from 'glob';
 
 const srcDirectory = `D:/tnc-main/src/apps/TessituraWeb/WebAppNG/src/app`;
 const moduleFilePaths = await glob(`${srcDirectory}/**/*.module.ts`, { ignore: 'node_modules/**' });
@@ -25,15 +25,15 @@ function removeServicesFromProviders(sourceFile: SourceFile) {
 
     if (serviceNames.length > 0) {
         const ngModuleDecorator = sourceFile.getClasses()[0]?.getDecorator('NgModule');
+        const moduleArguments = ngModuleDecorator?.getArguments()[0]?.asKind(SyntaxKind.ObjectLiteralExpression);
+        const providersProperty = moduleArguments?.getProperty('providers').asKind(SyntaxKind.PropertyAssignment);
 
-        const argument = ngModuleDecorator?.getArguments()[0];
-        const providersArray = argument && ts.isObjectLiteralExpression(argument) ? argument.asObjectLiteralExpression().getProperty('providers')?.asArrayLiteralExpression() : undefined;
-
-
-        if (providersArray) {
+        if (providersProperty) {
             serviceNames.forEach(serviceName => {
-                providersArray.getElements().forEach((element, index) => {
-                    if (element.getText() === serviceName) {
+                const providersArray = providersProperty.getFirstChildByKind(SyntaxKind.ArrayLiteralExpression);
+                providersArray?.getElements().forEach( (element, index) => {
+                    const elementText = element.getText();
+                    if (elementText === serviceName) {
                         providersArray.removeElement(index);
                     }
                 });
