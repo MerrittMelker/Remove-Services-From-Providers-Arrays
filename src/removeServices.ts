@@ -1,7 +1,7 @@
 ﻿import { ObjectLiteralExpression, Project, SourceFile, SyntaxKind } from "ts-morph";
 import { glob } from 'glob';
 
-const srcDirectory = `D:/tnc-main/src/apps/TessituraWeb/WebAppNG/src/app`;
+const srcDirectory = `<root_directory_for_module_file_search>`;
 const moduleFilePaths = await glob(`${srcDirectory}/**/*.module.ts`, { ignore: 'node_modules/**' });
 const project = new Project();
 
